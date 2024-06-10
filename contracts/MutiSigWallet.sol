@@ -102,7 +102,7 @@ contract MutiSigWallet {
     function confirmTransaction(uint256 transactionId) public onlyOwner {
         Transaction storage transaction = transactions[transactionId];
         require(!transaction.executed, "transaction executed");
-        require(!transactionIsConfirmed(transactionId, msg.sender), "transaction confirmed");
+        require(!transactionIsConfirmed(transactionId), "transaction confirmed");
         transaction.confirmations += 1;
         emit ConfirmTransaction(msg.sender, transactionId);
     }
@@ -110,12 +110,12 @@ contract MutiSigWallet {
     function revokeConfirmation(uint256 transactionId) public onlyOwner {
         Transaction storage transaction = transactions[transactionId];
         require(!transaction.executed, "transaction executed");
-        require(transactionIsConfirmed(transactionId, msg.sender), "transaction not confirmed");
+        require(transactionIsConfirmed(transactionId), "transaction not confirmed");
         transaction.confirmations -= 1;
         emit RevokeConfirmation(msg.sender, transactionId);
     }
 
-    function transactionIsConfirmed(uint256 transactionId, address owner) public view returns (bool) {
+    function transactionIsConfirmed(uint256 transactionId) public view returns (bool) {
         Transaction storage transaction = transactions[transactionId];
         return transaction.confirmations >= required;
     }
