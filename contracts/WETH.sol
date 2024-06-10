@@ -22,22 +22,21 @@ contract WETH {
     uint8 public decimals = 18;
     event Approval(address indexed src, address indexed delegateAds, uint256 amount);
     event Transfer(address indexed src, address indexed toAds, uint256 amount);
-    event Deposit(address indexed toAds, uint256 amount);
-    event Withdraw(address indexed src, uint256 amount);
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
-    // 存款
-    function deposit() public payable {
-        balanceOf[msg.sender] += msg.value;
-        emit Deposit(msg.sender, msg.value);
+    // 查询指定地址的 token 数量
+    function getTokens(address ads) public view returns (uint256) {
+        return balanceOf[ads];
     }
-    // 取款
-    function withdraw(uint256 amount) public {
-        require(balanceOf[msg.sender] >= amount);
-        balanceOf[msg.sender] -= amount;
-        payable(msg.sender).transfer(amount);
-        emit Withdraw(msg.sender, amount);
+    // 查询指定地址对另外一个地址的剩余授权额度
+    function getAllowance(address src, address delegateAds) public view returns (uint256) {
+        return allowance[src][delegateAds];
     }
+    // 查询当前合约的 Token 总量
+    function getTotalSupply() public view returns (uint256) {
+        return address(this).balance;
+    }
+
     // 查询金额
     function totalSupply() public view returns (uint256) {
         return address(this).balance;
@@ -66,11 +65,5 @@ contract WETH {
         balanceOf[toAds] += amount;
         emit Transfer(src, toAds, amount);
         return true;
-    }
-    fallback() external payable {
-        deposit();
-    }
-    receive() external payable {
-        deposit();
     }
 }
