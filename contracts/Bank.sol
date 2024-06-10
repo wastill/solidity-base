@@ -52,8 +52,8 @@ contract Bank {
     // 销毁合约
     function destory() external {
         require(msg.sender == owner, "only owner can destroy");
-        selfdestruct(payable(owner)); 
-        // payable(owner).transfer(address(this).balance); 
+        // selfdestruct(payable(owner)); 
+        payable(owner).transfer(address(this).balance); 
     }
     // 扩展 
     // ERC20
@@ -93,8 +93,7 @@ contract Bank {
         require(msg.sender == owner, "only owner can withdraw");
         require(address(this).balance >= amount, "insufficient balance");
         // 转移资产给用户Q
-        require(IERC721(token).transfer(msg.sender, amount), "Token transfer failed");
-        
+        IERC721(token).transferFrom(address(this), msg.sender, amount);        
         // 更新余额
         balances[msg.sender][token] -= amount;
         emit Withdraw(amount);
